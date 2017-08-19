@@ -20,5 +20,7 @@ namespace DM106_final.Models
         }
 
         public System.Data.Entity.DbSet<DM106_final.Models.Product> Products { get; set; }
+
+        public System.Data.Entity.DbSet<DM106_final.Models.Order> Orders { get; set; }
     }
 }
