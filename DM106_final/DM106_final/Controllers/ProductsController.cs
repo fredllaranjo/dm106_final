@@ -17,12 +17,14 @@ namespace DM106_final.Controllers
         private DM106_final_Private_Context db = new DM106_final_Private_Context();
 
         // GET: api/Products
+        [Authorize]
         public IQueryable<Product> GetProducts()
         {
             return db.Products;
         }
 
         // GET: api/Products/5
+        [Authorize]
         [ResponseType(typeof(Product))]
         public IHttpActionResult GetProduct(int id)
         {
@@ -36,6 +38,7 @@ namespace DM106_final.Controllers
         }
 
         // PUT: api/Products/5
+        [Authorize(Roles = "ADMIN")]
         [ResponseType(typeof(void))]
         public IHttpActionResult PutProduct(int id, Product product)
         {
@@ -50,6 +53,12 @@ namespace DM106_final.Controllers
             }
 
             db.Entry(product).State = EntityState.Modified;
+
+            Product persistedProduct = db.Products.Find(id);
+            if(!verifyProductModelAndCode(persistedProduct, product))
+            {
+                return BadRequest();
+            }
 
             try
             {
@@ -71,6 +80,7 @@ namespace DM106_final.Controllers
         }
 
         // POST: api/Products
+        [Authorize(Roles = "ADMIN")]
         [ResponseType(typeof(Product))]
         public IHttpActionResult PostProduct(Product product)
         {
@@ -78,7 +88,15 @@ namespace DM106_final.Controllers
             {
                 return BadRequest(ModelState);
             }
-
+            DbSet<Product> persistedProducts = db.Products;
+            foreach (var persistedProduct in persistedProducts)
+            {
+                if (verifyProductModelAndCode(persistedProduct, product))
+                {
+                    return Conflict();
+                }
+            }
+            
             db.Products.Add(product);
             db.SaveChanges();
 
@@ -86,6 +104,7 @@ namespace DM106_final.Controllers
         }
 
         // DELETE: api/Products/5
+        [Authorize(Roles = "ADMIN")]
         [ResponseType(typeof(Product))]
         public IHttpActionResult DeleteProduct(int id)
         {
@@ -99,6 +118,15 @@ namespace DM106_final.Controllers
             db.SaveChanges();
 
             return Ok(product);
+        }
+
+        private bool verifyProductModelAndCode(Product persistedProduct, Product product)
+        {
+            if (!persistedProduct.codigo.Equals(product.codigo) || !persistedProduct.modelo.Equals(product.modelo))
+            {
+                return false;
+            }
+            return true;
         }
 
         protected override void Dispose(bool disposing)

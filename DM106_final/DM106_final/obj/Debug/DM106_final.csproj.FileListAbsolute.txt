@@ -31,6 +31,7 @@ C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM10
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\Antlr3.Runtime.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\EntityFramework.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\EntityFramework.SqlServer.dll
+C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\leeksnet.AspNet.WebApi.Wadl.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\Microsoft.AI.Agent.Intercept.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\Microsoft.AI.DependencyCollector.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\Microsoft.AI.PerfCounterCollector.dll
@@ -120,7 +121,7 @@ C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM10
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\pt-br\Microsoft.Owin.Security.Twitter.resources.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\pt-br\Microsoft.Owin.Security.MicrosoftAccount.resources.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\pt-br\System.Web.Http.Owin.resources.dll
-C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.dll
-C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.pdb
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.Migrations.Initial.resources
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.csproj.GenerateResource.Cache
+C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.dll
+C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.pdb
