@@ -51,14 +51,12 @@ namespace DM106_final.Controllers
             {
                 return BadRequest();
             }
-
-            db.Entry(product).State = EntityState.Modified;
-
             Product persistedProduct = db.Products.Find(id);
-            if(!verifyProductModelAndCode(persistedProduct, product))
+            if (!verifyProductModelAndCode(persistedProduct, product))
             {
                 return BadRequest();
             }
+            db.Entry(product).State = EntityState.Modified;
 
             try
             {
@@ -96,7 +94,7 @@ namespace DM106_final.Controllers
                     return Conflict();
                 }
             }
-            
+
             db.Products.Add(product);
             db.SaveChanges();
 

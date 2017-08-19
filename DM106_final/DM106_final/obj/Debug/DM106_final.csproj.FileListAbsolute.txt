@@ -125,5 +125,4 @@ C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM10
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.csproj.GenerateResource.Cache
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.pdb
-C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.csprojResolveAssemblyReference.cache
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\DM106_final.Migrations.AddOrderAndOrderItem.resources
