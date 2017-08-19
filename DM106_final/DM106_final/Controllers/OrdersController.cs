@@ -12,21 +12,28 @@ using DM106_final.Models;
 
 namespace DM106_final.Controllers
 {
+    [RoutePrefix("api/Orders")]
     public class OrdersController : ApiController
     {
         private DM106_final_Private_Context db = new DM106_final_Private_Context();
 
         // GET: api/Orders
-        public IQueryable<Order> GetOrders()
+        [Authorize(Roles = "ADMIN")]
+        public List<Order> GetOrders()
         {
-            return db.Orders;
+            return db.Orders.Include(order => order.OrderItems).ToList();
         }
 
         // GET: api/Orders/5
+        [Authorize]
         [ResponseType(typeof(Order))]
         public IHttpActionResult GetOrder(int id)
         {
             Order order = db.Orders.Find(id);
+            if (isInvalidUser(order.userName))
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
             if (order == null)
             {
                 return NotFound();
@@ -35,20 +42,53 @@ namespace DM106_final.Controllers
             return Ok(order);
         }
 
-        // PUT: api/Orders/5
+        // GET: api/Orders/byEmail
+        [Authorize]
+        [ResponseType(typeof(Order))]
+        [HttpGet]
+        [Route("byEmail")]
+        public IHttpActionResult GetOrderByEmail(string email)
+        {
+            IQueryable<Order> orders = db.Orders.Where(p => p.userName == email);
+            if (isInvalidUser(email))
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
+            if (orders == null)
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+
+            return Ok(orders);
+        }
+
+        // PUT: api/Orders/closeOrder/5
+        [Authorize]
+        [HttpPut]
+        [Route("closeOrder")]
         [ResponseType(typeof(void))]
-        public IHttpActionResult PutOrder(int id, Order order)
+        public IHttpActionResult CloseOrder(int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
+            Order order = db.Orders.Find(id);
+            if (isInvalidUser(order.userName))
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
             if (id != order.Id)
             {
                 return BadRequest();
             }
+            if (order.precoFrete == 0)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.PreconditionFailed);
 
+                response.ReasonPhrase = "O Frete deve ser calculado antes do fechamento do pedido";
+                return ResponseMessage(response);
+            }
             db.Entry(order).State = EntityState.Modified;
 
             try
@@ -71,6 +111,7 @@ namespace DM106_final.Controllers
         }
 
         // POST: api/Orders
+        [Authorize]
         [ResponseType(typeof(Order))]
         public IHttpActionResult PostOrder(Order order)
         {
@@ -79,6 +120,18 @@ namespace DM106_final.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (isInvalidUser(order.userName))
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
+
+            //Overwrite new order to default values
+            order.status = "novo";
+            order.pesoTotalPedido = 0;
+            order.precoFrete = 0;
+            order.precoTotalPedido = 0;
+            order.dataPedido = DateTime.Now.ToString("dd/MM/yyyy");
+
             db.Orders.Add(order);
             db.SaveChanges();
 
@@ -86,10 +139,15 @@ namespace DM106_final.Controllers
         }
 
         // DELETE: api/Orders/5
+        [Authorize]
         [ResponseType(typeof(Order))]
         public IHttpActionResult DeleteOrder(int id)
         {
             Order order = db.Orders.Find(id);
+            if (isInvalidUser(order.userName))
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
             if (order == null)
             {
                 return NotFound();
@@ -108,6 +166,11 @@ namespace DM106_final.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private bool isInvalidUser(string username)
+        {
+            return !User.IsInRole("ADMIN") && !User.Identity.Name.Equals(username);
         }
 
         private bool OrderExists(int id)
