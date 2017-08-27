@@ -9,6 +9,8 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using DM106_final.Models;
+using DM106_final.CRMClient;
+using DM106_final.br.com.correios.ws;
 
 namespace DM106_final.Controllers
 {
@@ -30,6 +32,10 @@ namespace DM106_final.Controllers
         public IHttpActionResult GetOrder(int id)
         {
             Order order = db.Orders.Find(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
             if (isInvalidUser(order.userName))
             {
                 return StatusCode(HttpStatusCode.Forbidden);
@@ -74,6 +80,10 @@ namespace DM106_final.Controllers
                 return BadRequest(ModelState);
             }
             Order order = db.Orders.Find(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
             if (isInvalidUser(order.userName))
             {
                 return StatusCode(HttpStatusCode.Forbidden);
@@ -89,10 +99,12 @@ namespace DM106_final.Controllers
                 response.ReasonPhrase = "O Frete deve ser calculado antes do fechamento do pedido";
                 return ResponseMessage(response);
             }
+            order.status = "fechado";
             db.Entry(order).State = EntityState.Modified;
 
             try
             {
+
                 db.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
@@ -112,6 +124,7 @@ namespace DM106_final.Controllers
 
         // POST: api/Orders
         [Authorize]
+        [HttpPost]
         [ResponseType(typeof(Order))]
         public IHttpActionResult PostOrder(Order order)
         {
@@ -140,23 +153,147 @@ namespace DM106_final.Controllers
 
         // DELETE: api/Orders/5
         [Authorize]
+        [HttpDelete]
         [ResponseType(typeof(Order))]
         public IHttpActionResult DeleteOrder(int id)
         {
             Order order = db.Orders.Find(id);
-            if (isInvalidUser(order.userName))
-            {
-                return StatusCode(HttpStatusCode.Forbidden);
-            }
             if (order == null)
             {
                 return NotFound();
+            }
+            if (isInvalidUser(order.userName))
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
             }
 
             db.Orders.Remove(order);
             db.SaveChanges();
 
             return Ok(order);
+        }
+
+        // PUT: api/Orders/calcfrete/5
+        [Authorize]
+        [HttpPut]
+        [Route("calcFreteOrder")]
+        [ResponseType(typeof(Order))]
+        public IHttpActionResult CalcFreteOrder(int id)
+        {
+            Order order = db.Orders.Find(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+            if (isInvalidUser(order.userName))
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
+            if (!"novo".Equals(order.status))
+            {
+                return BadRequest("Impossível calcular frete para pedido com status: " + order.status);
+            }
+            if (order.OrderItems.Count() <= 0)
+            {
+                return BadRequest("Impossível calcular frete para pedido sem itens.");
+            }
+            decimal precoItens = 0;
+            decimal pesoItens = 0;
+            decimal totalComprimento = 0;
+            decimal maiorLargura = 0;
+            decimal maiorAltura = 0;
+            decimal maiorDiametro = 0;
+            foreach (OrderItem orderItem in order.OrderItems)
+            {
+                //Get Product statuses
+                Product product = db.Products.Find(orderItem.ProductId);
+                precoItens += product.preco * orderItem.Quantidade;
+                pesoItens += product.peso * orderItem.Quantidade;
+                totalComprimento += product.comprimento * orderItem.Quantidade;
+                if (product.largura > maiorLargura)
+                {
+                    maiorLargura = product.largura;
+                }
+                if (product.altura > maiorAltura)
+                {
+                    maiorAltura = product.altura;
+                }
+                if (product.diametro > maiorDiametro)
+                {
+                    maiorDiametro = product.diametro;
+                }
+            }
+            Double precoFrete = 0;
+            Double prazoEntrega = 0;
+            string cepDestino = ObtemCEP(order.userName);
+            if (cepDestino != null)
+            {
+                cServico precoPrazo = ObtemFrete(cepDestino, totalComprimento, maiorLargura, maiorAltura, maiorDiametro, precoItens);
+                if (precoPrazo != null && precoPrazo.MsgErro == null)
+                {
+                    precoFrete = Convert.ToDouble(precoPrazo.Valor.Replace(",","."));
+                    prazoEntrega = Convert.ToDouble(precoPrazo.PrazoEntrega);
+                }
+                else
+                {
+                    //Erro ao consultar WS Correios
+                    return BadRequest(precoPrazo.MsgErro);
+                }
+            }
+            else
+            {
+                //Erro ao consultar CRM
+                return BadRequest("Erro ao obter o cep destino - CRM indisponível ou usuário não encontrado");
+            }
+
+            order.pesoTotalPedido = pesoItens;
+            order.precoFrete = (decimal)precoFrete;
+            order.precoTotalPedido = (decimal)precoFrete + precoItens;
+
+            DateTime dataPedido = DateTime.ParseExact(order.dataPedido, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
+            order.dataEntrega = dataPedido.AddDays(prazoEntrega).ToString("dd/MM/yyyy");
+
+            db.Entry(order).State = EntityState.Modified;
+            db.SaveChanges();
+
+            return Ok(order);
+        }
+
+        private cServico ObtemFrete(string cepDestino, decimal comprimento, decimal largura, decimal altura, decimal diametro, decimal valorDeclarado)
+        {
+            CalcPrecoPrazoWS correiosWS = new CalcPrecoPrazoWS();
+            cResultado resultado = correiosWS.CalcPrecoPrazo("", "", "40010", "37540000", cepDestino, "1", 1, comprimento, largura, altura, diametro, "N", valorDeclarado, "S");
+            if (resultado != null)
+            {
+                if (!resultado.Servicos[0].Erro.Equals("0"))
+                {
+                    resultado.Servicos[0].MsgErro = "Erro ao calcular o frete - Código do erro WS Correios: " + resultado.Servicos[0].Erro + "-" + resultado.Servicos[0].MsgErro;
+
+                }
+                else
+                {
+                    resultado.Servicos[0].MsgErro = null;
+                }
+            }
+            else
+            {
+                resultado.Servicos[0].MsgErro = "Erro ao calcular o frete - WS Correios indisponível";
+            }
+            return resultado.Servicos[0];
+        }
+
+        private string ObtemCEP(string email)
+        {
+            CRMRestClient crmClient = new CRMRestClient();
+            Customer customer = crmClient.GetCustomerByEmail(email);
+            if (customer != null)
+            {
+                return customer.zip;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -170,7 +307,7 @@ namespace DM106_final.Controllers
 
         private bool isInvalidUser(string username)
         {
-            return !User.IsInRole("ADMIN") && !User.Identity.Name.Equals(username);
+            return username == null || (!User.IsInRole("ADMIN") && !User.Identity.Name.Equals(username));
         }
 
         private bool OrderExists(int id)

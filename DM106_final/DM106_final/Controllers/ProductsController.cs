@@ -56,7 +56,9 @@ namespace DM106_final.Controllers
             {
                 return BadRequest();
             }
-            db.Entry(product).State = EntityState.Modified;
+
+            db.Entry(persistedProduct).CurrentValues.SetValues(product);
+            db.Entry(persistedProduct).State = EntityState.Modified;
 
             try
             {

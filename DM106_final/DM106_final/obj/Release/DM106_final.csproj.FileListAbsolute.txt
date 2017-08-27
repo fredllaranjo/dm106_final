@@ -127,3 +127,6 @@ C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM10
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Release\DM106_final.csproj.GenerateResource.Cache
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\leeksnet.AspNet.WebApi.Wadl.dll
 C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Release\DM106_final.Migrations.AddOrderAndOrderItem.resources
+C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\bin\DM106_final.XmlSerializers.dll
+C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Release\DM106_final.Migrations.Final.resources
+C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Release\DM106_final.XmlSerializers.dll

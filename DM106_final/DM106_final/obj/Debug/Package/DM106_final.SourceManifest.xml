@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<sitemanifest>
+  <IisApp path="C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\Package\PackageTmp" />
+  <setAcl path="C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\Package\PackageTmp" setAclResourceType="Directory" />
+  <setAcl path="C:\Users\FredericoAugusto\Documents\Visual Studio 2017\Projects\dm106_final\DM106_final\DM106_final\obj\Debug\Package\PackageTmp" setAclUser="anonymousAuthenticationUser" setAclResourceType="Directory" />
+</sitemanifest>
